@@ -5,6 +5,4 @@
 # Features
  Working point system, global leaderboard, message count tracker (not a message logger, it just counts the amount of messages). New features are still being added.
 # Notes
- There is a known bug where if less than 3 people have a score, and someone runs the leaderboard command, the bot will throw an error.
- Bot is temporarily not open source, it may be later. There is sample code in this repo for people looking to get started with discord.py, which includes sample commands for discord slash commands, buttons, and embeds.
- This github page is an issue tracker for the bot, although feature requests and bug reports may also be posted [here](https://discord.gg/C2UFcVdR).
+ This bot is still being worked on to be ready for open-source. Changes here may be slower then the main bot.
