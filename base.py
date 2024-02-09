@@ -24,7 +24,7 @@ async def uwu(message):
     return new
 
 async def num(num: int):
-    for unit in ("", "Thousand", "Million", "Billion", "Trillion", "Quadrillion", "Quintillion", "Sextillion", "Septillion"):
+    for unit in ("", "thousand", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion", "septillion"):
         if abs(num) < 1000:
             return f"{round(num, 1)} {unit}"
         num /= 1000
