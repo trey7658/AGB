@@ -1,26 +1,12 @@
 import os
 try:
-    import discord, sys, asyncio
+    import discord, sys, asyncio, shelve, json, atexit, glob, filecmp, requests, os.path, shutil, datetime, platform
     from discord.utils import get
     from discord import app_commands, Interaction
-    import shelve
     from pyprobs import Probability as pr
     import random as rand
     from typing import Literal
     from discord.app_commands import AppCommandError
-    import json
-    import atexit
-    import glob
-    import filecmp
-    try:
-        import requests
-    except:
-        sys.path.append("C:\\users\\treym\\appdata\\local\\programs\\python\\python312\\lib\\site-packages")
-        import requests
-    import os.path
-    import shutil
-    import datetime
-    import platform
     from googletrans import Translator
     translator = Translator()
 except ModuleNotFoundError:
