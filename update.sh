@@ -8,7 +8,7 @@ git stage *
 echo Make sure you have ran /backup and /shutdown if the bot is running, you have 5 seconds to CTRL-C
 sleep 5s
 read -p "Commit message: " commit
-git commit $commit
+git commit -m "$commit"
 git pull
 git push
 sudo docker build -t trwy7/agb .
