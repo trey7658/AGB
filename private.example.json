@@ -1,0 +1,8 @@
+{
+    "tokens": {
+        "agb": "BOT_TOKEN"
+    },
+    "guildid": 1000, 
+    "ownerid": 1000,
+    "backup-pin": 1234
+}

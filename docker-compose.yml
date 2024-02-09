@@ -1,0 +1,11 @@
+name: AGB
+services:
+    agb:
+        tty: true
+        stdin_open: true
+        volumes:
+            - /media/Bot/discordbot/data:/data
+        hostname: agbdocker
+        container_name: agb
+        restart: unless-stopped
+        image: trwy7/agb

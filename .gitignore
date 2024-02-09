@@ -1,4 +1,6 @@
-
-*.bak
-*.dat
-*.dir
+__pycache__/
+stats.json
+private.json
+docker/
+data/
+tool.py
