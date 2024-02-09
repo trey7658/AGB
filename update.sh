@@ -9,8 +9,6 @@ echo Make sure you have ran /backup and /shutdown if the bot is running, you hav
 sleep 5s
 read -p "Commit message: " commit
 git commit -m "$commit"
-git pull
-git push
 sudo docker build -t trwy7/agb .
 sudo docker stop agb
 sudo docker remove agb
