@@ -1,0 +1,8 @@
+discord.py
+asyncio
+pyprobs
+typing
+enum34
+requests
+googletrans
+babel

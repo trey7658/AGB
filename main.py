@@ -24,61 +24,8 @@ try:
     from googletrans import Translator
     translator = Translator()
     from babel import Locale
-except:
-    try:
-        os.system('python -m pip install discord.py asyncio pyprobs typing enum34 requests googletrans babel')
-        os.system('python3 -m pip install discord.py asyncio pyprobs typing enum34 requests googletrans babel')
-        import discord, time, sys, asyncio
-        from discord.utils import get
-        from discord import app_commands, Interaction, ui
-        import shelve
-        from pyprobs import Probability as pr
-        import random as rand
-        from typing import Literal
-        from discord.app_commands import AppCommandError
-        import json
-        import atexit
-        import glob
-        import filecmp
-        try:
-            import requests
-        except:
-            sys.path.append("C:\\users\\treym\\appdata\\local\\programs\\python\\python312\\lib\\site-packages")
-            import requests
-        import os.path
-        import shutil
-        import datetime
-        import platform
-        from googletrans import Translator
-        translator = Translator()
-        from babel import Locale
-    except:    
-        import sys
-        sys.path.append("/data/packages")
-        import discord, time, sys, asyncio
-        from discord.utils import get
-        from discord import app_commands, Interaction, ui
-        import shelve
-        from pyprobs import Probability as pr
-        import random as rand
-        from typing import Literal
-        from discord.app_commands import AppCommandError
-        import json
-        import atexit
-        import glob
-        import filecmp
-        try:
-            import requests
-        except:
-            sys.path.append("C:\\users\\treym\\appdata\\local\\programs\\python\\python312\\lib\\site-packages")
-            import requests
-        import os.path
-        import shutil
-        import datetime
-        import platform
-        from googletrans import Translator
-        translator = Translator()
-        from babel import Locale
+except ModuleNotFoundError:
+    print('not all packages have been installed')
 import pprint
 print('Loading intents and discord client')
 intents = discord.Intents.default()
