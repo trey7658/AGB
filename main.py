@@ -1,8 +1,8 @@
 import os
 try:
-    import discord, time, sys, asyncio
+    import discord, sys, asyncio
     from discord.utils import get
-    from discord import app_commands, Interaction, ui
+    from discord import app_commands, Interaction
     import shelve
     from pyprobs import Probability as pr
     import random as rand
@@ -23,10 +23,8 @@ try:
     import platform
     from googletrans import Translator
     translator = Translator()
-    from babel import Locale
 except ModuleNotFoundError:
     print('not all packages have been installed')
-import pprint
 print('Loading intents and discord client')
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
