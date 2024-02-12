@@ -1,5 +1,5 @@
 name: Bug Report
-about: Create a bug report to help us improve
+description: Create a bug report to help us improve
 
 title: "[BUG] <text here>"
 labels: bug
@@ -48,6 +48,4 @@ body:
   - type: markdown
     id: bug_additional_info
     attributes:
-      label: Additional Information
-      description: Any additional information or context about the bug
-      placeholder: Enter any additional information
+      value: ""
