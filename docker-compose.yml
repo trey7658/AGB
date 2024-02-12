@@ -4,7 +4,7 @@ services:
         tty: true
         stdin_open: true
         volumes:
-            - /media/Bot/discordbot/data:/data
+            - $(pwd)/data:/data
         hostname: agbdocker
         container_name: agb
         restart: unless-stopped
