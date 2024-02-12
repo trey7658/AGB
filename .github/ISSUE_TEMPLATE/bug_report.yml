@@ -38,15 +38,15 @@ body:
     validations:
       required: true
   - type: checkboxes
-  id: bug_environment
-  attributes:
-    label: Environment
-    description: Select the environment(s) where the bug occurs
-    options:
-      - label: Development
-        value: development
-      - label: Production
-        value: production
+    id: bug_environment
+    attributes:
+      label: Environment
+      description: Select the environment(s) where the bug occurs
+      options:
+        - label: Development
+          value: development
+        - label: Production
+          value: production
   - type: markdown
     id: bug_additional_info
     attributes:
