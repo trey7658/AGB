@@ -45,7 +45,8 @@ body:
       options:
         - label: Development
         - label: Production
-  - type: markdown
+  - type: textarea
     id: bug_additional_info
     attributes:
-      value: "## Additional info"
+      label: 'Additional context'
+      description: 'Add any other context or screenshots go here'
