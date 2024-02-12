@@ -564,7 +564,6 @@ async def beg(interaction: discord.Interaction):
         embed.add_field(name="Loss", value=f"Someone stole {abs(stealamount)} from your wallet", inline=False) 
     stats['scores'][str(interaction.user.id)] = score + stealamount
     await interaction.response.send_message(embed=embed)
-    
 
 @tree.command(name='dig', description='Dig for money')
 @app_commands.checks.cooldown(1, 25, key=lambda i: (i.user.id))
