@@ -31,9 +31,9 @@ body:
       options:
         - label: 'Yes'
         - label: 'No'
-      validations:
-        required: true
-  - type: markdown
+    validations:
+      required: true
+  - type: textarea
     id: context
     attributes:
       label: 'Additional context'
