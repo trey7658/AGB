@@ -24,17 +24,15 @@ body:
     validations:
       required: true
   - type: dropdown
-  id: willing-to-contribute
-  attributes:
-    label: 'Are you willing to contribute this feature?'
-    description: 'Indicate if you are willing to contribute to the development of this feature'
-    options:
-      - label: 'Yes'
-        value: 'yes'
-      - label: 'No'
-        value: 'no'
-    validations:
-      required: true
+    id: willing-to-contribute
+    attributes:
+      label: 'Are you willing to contribute this feature?'
+      description: 'Indicate if you are willing to contribute to the development of this feature'
+      options:
+        - label: 'Yes'
+        - label: 'No'
+      validations:
+        required: true
   - type: markdown
     id: context
     attributes:
