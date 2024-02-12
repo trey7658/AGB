@@ -1,0 +1,53 @@
+name: Bug Report
+about: Create a bug report to help us improve
+
+title: "[BUG] <text here>"
+labels: bug
+
+body:
+  - type: input
+    id: bug_description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of the bug
+      placeholder: Enter the bug description
+    validations:
+      required: true
+  - type: textarea
+    id: bug_steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the bug
+      placeholder: Enter the steps to reproduce the bug
+    validations:
+      required: true
+  - type: input
+    id: bug_expected_result
+    attributes:
+      label: Expected Result
+      description: A clear and concise description of what you expected to happen
+      placeholder: Enter the expected result
+    validations:
+      required: true
+  - type: input
+    id: bug_actual_result
+    attributes:
+      label: Actual Result
+      description: A clear and concise description of what actually happened
+      placeholder: Enter the actual result
+    validations:
+      required: true
+  - type: checkboxes
+    id: bug_environment
+    attributes:
+      label: Environment
+      description: Select the environment(s) where the bug occurs
+      options:
+        - Development
+        - Production
+  - type: markdown
+    id: bug_additional_info
+    attributes:
+      label: Additional Information
+      description: Any additional information or context about the bug
+      placeholder: Enter any additional information

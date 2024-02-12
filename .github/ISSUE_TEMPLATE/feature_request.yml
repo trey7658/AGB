@@ -1,0 +1,40 @@
+name: Feature Request
+description: Suggest a new feature for the project
+title: '[FEATURE] <text here>'
+labels:
+  - "enhancement"
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: 'Describe your feature request'
+      description: 'Describe what you would like to see added to the project' 
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: 'Is your feature request related to a problem?'
+      description: 'Explain the problem or limitation that this feature would address'
+  - type: textarea
+    id: solution
+    attributes:
+      label: 'Describe the solution you would like'
+      description: 'Provide a clear and concise description of what you want to happen'
+  validations:
+    required: true
+  - type: dropdown
+    id: willing-to-contribute
+    attributes:
+      label: 'Are you willing to contribute this feature?'
+      description: 'Indicate if you are willing to contribute to the development of this feature'
+      options:
+        - Yes
+        - No
+    validations:
+      required: true
+  - type: markdown
+    id: context
+    attributes:
+      label: 'Additional context'
+      description: 'Add any other context or screenshots about the feature request here'
