@@ -1,0 +1,28 @@
+   #     #####  ######  
+  # #   #     # #     # 
+ #   #  #       #     # 
+#     # #  #### ######  
+####### #     # #     # 
+#     # #     # #     # 
+#     #  #####  ######  
+
+# This is an example of the private.yml file, this file is used to store private information such as bot tokens and user IDs
+# This file should not be shared with anyone, and should be kept secret
+
+# IMPORTANT: This file should be renamed to private.yml and filled out with the correct information
+
+tokens:
+  # Put your bot token here, this is the token that will be used for the main bot
+  agb: "your-bot-token"
+
+  # agb_dev is not used yet, dont try to use it
+  agb_dev: "your-dev-bot-token"
+
+# Put the owner user ID here, this will allow you to use owner commands on the bot
+owner: your-user-id
+
+# Put your owner guild ID here, all admin commands will be restricted to this guild
+guild: your-guild-id
+
+# Put your restore pin here, this will allow you to restore your bot to a previous state, it is recommended to keep this secret as anyone with this can delete all bot data
+restore-pin: your-restore-pin
