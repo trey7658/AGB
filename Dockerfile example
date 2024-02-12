@@ -14,6 +14,6 @@ COPY private.yml /
 COPY base.py /
 COPY requirements.txt /
 RUN chmod a+x /main.py
-RUN python3 -m pip install -r requirements.txt
+RUN python3 -m pip install -r /requirements.txt
 
 CMD python3 /main.py
