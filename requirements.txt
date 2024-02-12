@@ -6,3 +6,4 @@ enum34
 requests
 googletrans
 babel
+oyaml

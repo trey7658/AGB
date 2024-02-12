@@ -1,6 +1,6 @@
 import os
 try:
-    import discord, sys, asyncio, shelve, json, atexit, glob, filecmp, requests, os.path, shutil, datetime, platform
+    import discord, sys, asyncio, shelve, oyaml, json, atexit, glob, filecmp, requests, os.path, shutil, datetime, platform
     from discord.utils import get
     from discord import app_commands, Interaction
     from pyprobs import Probability as pr
@@ -16,12 +16,12 @@ intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 try:
-    with open("private.json", "r") as f:
-        private = json.load(f)
+    with open("private.yml", "r") as f:
+        private = oyaml.safe_load(f)
 except:
     try:
-        with open("/private.json", "r") as f:
-            private = json.load(f)
+        with open("/private.yml", "r") as f:
+            private = oyaml.safe_load(f)
     except:
         print('Cant load private file')
         raise AttributeError('Cant find private file')
@@ -833,7 +833,7 @@ async def backup(interaction: discord.Interaction, upload: bool):
 
 @tree.command(name='restore', description='DANGER', guild=discord.Object(id=private["guildid"]))
 async def restore(interaction: discord.Interaction, backup: discord.Attachment, pin: int):
-    if interaction.user.id == private["ownerid"] and pin == private["backup-pin"]:
+    if interaction.user.id == private["ownerid"] and pin == private["restore-pin"]:
         file_request = requests.get(backup)
         content = file_request.content.decode('utf-8')
         newtemp = json.loads(content)

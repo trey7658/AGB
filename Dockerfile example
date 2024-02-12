@@ -1,3 +1,6 @@
+# This is a Dockerfile for AGB
+# You should rename this to Dockerfile before compiling
+
 FROM python:latest
 
 RUN python3 -m venv venv
