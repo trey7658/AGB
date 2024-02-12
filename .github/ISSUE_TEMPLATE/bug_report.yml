@@ -43,8 +43,8 @@ body:
       label: Environment
       description: Select the environment(s) where the bug occurs
       options:
-        - label: Development
-        - label: Production
+        - Development
+        - Production
   - type: textarea
     id: bug_additional_info
     attributes:
