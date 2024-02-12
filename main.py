@@ -14,7 +14,7 @@ except ModuleNotFoundError:
 print('Loading intents and discord client')
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
-tree = app_commands.CommandTree(client)
+tree = discord.app_commands.CommandTree(client)
 try:
     with open("private.yml", "r") as f:
         private = oyaml.safe_load(f)
