@@ -67,6 +67,12 @@ sys.path.insert(1, '/')
 from base import uwu, num
 # generic commands
 
+async def getowner():
+    if client.application.team == None:
+        return client.application.owner
+    else:
+        return client.application.team.owner
+
 @client.event
 async def on_ready():
     print(f'Logged on as {client.user.name}, attempting to sync commands')
