@@ -144,16 +144,6 @@ async def on_message(message):
                     score = 0
                 stats['scores'][str(message.author.id)] = score + 10
     if f'{message.guild}' == 'None':
-        if message.author.id == private["ownerid"]:
-            if message.content.startswith(f'exec {str(private["sudo-pin"])} '):
-                msg = message.content
-                msg = msg.removeprefix(f'exec {str(private["sudo-pin"])} ')
-                var = None
-                exec(f'var = {msg}')
-                try:
-                    await message.channel.send(f'```{var}```', reference=message)
-                except Exception as exception:
-                    await message.channel.send('Could not parse result: ' + exception, reference=message)
         if not {message.author} == {client.user}:
             if message.content == ':newspaper:' or message.content == '<a:RPS_paper:1175245811282628628>' or message.content == '📰' or message.content == '📄' or message.content == '🪨' or message.content == '<a:RPS_rock:1175245831398510704>' or message.content == ':rock:' or message.content == '✂️' or message.content == '<a:RPS_scissors:1175245784380346549>' or message.content == ':scissors:':
                 rpscore = rand.randrange(1,4)
@@ -163,7 +153,7 @@ async def on_message(message):
                     await message.channel.send('📄')
                 elif rpscore == 3:
                     await message.channel.send('🪨')
-            elif not message.content == '3' and not message.content == '2' and not message.content == '1' and not message.content == 'rps' and not message.content == 'rock paper scissors':
+            elif not message.content == '3' and not message.content.startswith('exec ') and not message.content == '2' and not message.content == '1' and not message.content == 'rps' and not message.content == 'rock paper scissors':
                 async with message.channel.typing():
                     await asyncio.sleep(3)
                 await message.channel.send(f'Not a valid command, please use slash commands', reference=message)
@@ -1001,18 +991,6 @@ async def getbackup(interaction: discord.Interaction):
         files = list(filter(os.path.isfile, glob.glob(search_dir + "*")))
         files.sort(key=lambda x: os.path.getmtime(x))
         await interaction.response.send_message(f"This is the most recent backup", file=discord.File(files[-1]), ephemeral=True)
-    else:
-        await interaction.response.send_message('You must be trwy to use this command!', ephemeral=True)
-
-@tree.command(name='exec', description='DANGER will allow running unsigned code', guild=discord.Object(id=private["guildid"]))
-async def exec(interaction: discord.Interaction, cmd: str, pin: int):
-    if interaction.user.id == private["ownerid"] and pin == private["sudo-pin"]:
-        var = None
-        exec('var = ' + cmd)
-        try:
-            await interaction.response.send_message(f"```{var}```", ephemeral=True)
-        except:
-            await interaction.response.send_message(f"Cannot get response", ephemeral=True)
     else:
         await interaction.response.send_message('You must be trwy to use this command!', ephemeral=True)
 
