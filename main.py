@@ -73,6 +73,10 @@ async def getowner():
     else:
         return client.application.team.owner
 
+async def getownerid():
+    owner = await getowner()
+    return owner.id
+
 @client.event
 async def on_ready():
     print(f'Logged on as {client.user.name}, attempting to sync commands')
@@ -238,7 +242,7 @@ async def uwucmd(interaction: discord.Interaction, message: str):
 
 @tree.command(name='sync', description='Owner only', guild=discord.Object(id=private["guildid"]))
 async def sync(interaction: discord.Interaction):
-    if interaction.user.id == private["ownerid"]:
+    if interaction.user.id == await getownerid():
         print('Starting sync')
         await interaction.response.send_message(f"Syncing", ephemeral=True)
         await tree.sync()
@@ -248,7 +252,7 @@ async def sync(interaction: discord.Interaction):
 
 @tree.command(name='shutdown', description='Shutdown', guild=discord.Object(id=private["guildid"]))
 async def shutdown(interaction: discord.Interaction):
-    if interaction.user.id == private["ownerid"]:
+    if interaction.user.id == await getownerid():
         try:
             await interaction.response.send_message("Shutting down", ephemeral=True)
         except:
@@ -262,7 +266,7 @@ async def shutdown(interaction: discord.Interaction):
 
 @tree.command(name='dm', description='DM someone', guild=discord.Object(id=private["guildid"]))
 async def dm(interaction: discord.Interaction, user: discord.User, message: str):
-    if interaction.user.id == private["ownerid"]:
+    if interaction.user.id == await getownerid():
         try:
             await user.send(message)
             await interaction.response.send_message(f'Sent to {user.mention}: {message}', ephemeral=True)
@@ -952,7 +956,7 @@ async def leaderboardcmd(interaction):
 
 @tree.command(name='giveadm', description='Add balance', guild=discord.Object(id=private["guildid"]))
 async def giveadm(interaction: discord.Interaction, user: discord.User, amount: int):
-    if interaction.user.id == private["ownerid"]:
+    if interaction.user.id == await getownerid():
         persontemp = user
         try:
             score = stats['scores'][str(persontemp.id)]
@@ -965,7 +969,7 @@ async def giveadm(interaction: discord.Interaction, user: discord.User, amount: 
 
 @tree.command(name='backup', description='backup points', guild=discord.Object(id=private["guildid"]))
 async def backup(interaction: discord.Interaction, upload: bool):
-    if interaction.user.id == private["ownerid"]:
+    if interaction.user.id == await getownerid():
         backuploc = await backupstats()
         if not backuploc == False:
             if upload:
@@ -979,7 +983,7 @@ async def backup(interaction: discord.Interaction, upload: bool):
 
 @tree.command(name='restore', description='DANGER', guild=discord.Object(id=private["guildid"]))
 async def restore(interaction: discord.Interaction, backup: discord.Attachment, pin: int):
-    if interaction.user.id == private["ownerid"] and pin == private["sudo-pin"]:
+    if interaction.user.id == await getownerid() and pin == private["sudo-pin"]:
         file_request = requests.get(backup)
         content = file_request.content.decode('utf-8')
         newtemp = json.loads(content)
@@ -992,7 +996,7 @@ async def restore(interaction: discord.Interaction, backup: discord.Attachment, 
 @tree.command(name='getbackup', description='get most recent backup', guild=discord.Object(id=private["guildid"]))
 @app_commands.checks.cooldown(2, 90, key=lambda i: (i.user.id))
 async def getbackup(interaction: discord.Interaction):
-    if interaction.user.id == private["ownerid"]:
+    if interaction.user.id == await getownerid():
         search_dir = "backup/"
         files = list(filter(os.path.isfile, glob.glob(search_dir + "*")))
         files.sort(key=lambda x: os.path.getmtime(x))

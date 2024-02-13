@@ -18,9 +18,6 @@ tokens:
   # agb_dev is not used yet, dont try to use it
   agb_dev: "your-dev-bot-token"
 
-# Put the owner user ID here, this will allow you to use owner commands on the bot
-owner: your-user-id
-
 # Put your owner guild ID here, all admin commands will be restricted to this guild
 guild: your-guild-id
 
