@@ -248,7 +248,8 @@ async def sync(interaction: discord.Interaction):
         await tree.sync()
         print('Command tree synced.')
     else:
-        await interaction.response.send_message('You must be trwy to use this command!', ephemeral=True)
+        owner = await getowner()
+        await interaction.response.send_message(f'You must be {owner.name} to use this command!', ephemeral=True)
 
 @tree.command(name='shutdown', description='Shutdown', guild=discord.Object(id=private["guildid"]))
 async def shutdown(interaction: discord.Interaction):
@@ -979,7 +980,8 @@ async def backup(interaction: discord.Interaction, upload: bool):
         else:
             await interaction.response.send_message('Nothing to back up', ephemeral=True)
     else:
-        await interaction.response.send_message('You must be trwy to use this command!', ephemeral=True)
+        owner = await getowner()
+        await interaction.response.send_message(f'You must be {owner.name} to use this command!', ephemeral=True)
 
 @tree.command(name='restore', description='DANGER', guild=discord.Object(id=private["guildid"]))
 async def restore(interaction: discord.Interaction, backup: discord.Attachment, pin: int):
@@ -991,7 +993,8 @@ async def restore(interaction: discord.Interaction, backup: discord.Attachment, 
         stats = newtemp
         await interaction.response.send_message('Complete', ephemeral=True)
     else:
-        await interaction.response.send_message('You must be trwy to use this command!', ephemeral=True)
+        owner = await getowner()
+        await interaction.response.send_message(f'You must be {owner.name} to use this command!', ephemeral=True)
 
 @tree.command(name='getbackup', description='get most recent backup', guild=discord.Object(id=private["guildid"]))
 @app_commands.checks.cooldown(2, 90, key=lambda i: (i.user.id))
@@ -1002,7 +1005,8 @@ async def getbackup(interaction: discord.Interaction):
         files.sort(key=lambda x: os.path.getmtime(x))
         await interaction.response.send_message(f"This is the most recent backup", file=discord.File(files[-1]), ephemeral=True)
     else:
-        await interaction.response.send_message('You must be trwy to use this command!', ephemeral=True)
+        owner = await getowner()
+        await interaction.response.send_message(f'You must be {owner.name} to use this command!', ephemeral=True)
 
 def save_stats():
     with open("stats.json", "w") as f:
