@@ -25,14 +25,27 @@ except:
     except:
         print('Cant load private file')
         raise AttributeError('Cant find private file')
-
+def ifemptycreate(dict, var, value = {}):
+    # Create the var if it does not exist
+    if not var in dict:
+        dict[var] = value
+        return True
+    return False
 print('Loading stats')
+statsdefvars = {'scores': {}, 'item': {'laptop': {}, 'shovel': {}}, 'usersettings': {}}
 try:
     with open("stats.json", "r") as f:
         stats = json.load(f)
-except:
+    for key, value in statsdefvars.items():
+        if ifemptycreate(stats, key, value):
+            print('Created ' + key)
+        if isinstance(value, dict):
+            for key2, value2 in value.items():
+                if ifemptycreate(stats[key], key2, value2):
+                    print('Created ' + key + '.' + key2)
+except FileNotFoundError:
     print('Creating stats file')
-    stats = {'scores': {}, 'item': {'laptop': {}, 'shovel': {}}}
+    stats = statsdefvars
     with open("stats.json", "w") as f:
         json.dump(stats , f, sort_keys=False, indent=4)
     with open("stats.json", "r") as f:
@@ -380,160 +393,134 @@ class ItemShop(discord.ui.View):
         await interaction.response.edit_message(view=None, content='Shop closed')
         self.stop()
 
-class CrimeMenu(discord.ui.View):
-    def __init__(self, author):
-        self.author = author
-        super().__init__()
-    @discord.ui.button(label="eat hotdog sideways", style=discord.ButtonStyle.blurple)
-    async def SidewaysHotdog(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id == self.author:
-            good = pr.prob(3/4)
-            if good:
-                embed = discord.Embed(
-                    title="Sideways hotdog",
-                    color=discord.Color.green(),
-                )
-                amnt = rand.randrange(1,25)
-                embed.add_field(name="Win", value=f"You successfully got {amnt} points from people begging you to go away", inline=False)
-            else:
-                embed = discord.Embed(
-                    title="Sideways hotdog",
-                    color=discord.Color.red(),
-                )
-                amnt = 0
-                embed.add_field(name="Loss", value=f"Nobody cared", inline=False)
-            try:
-                score = stats['scores'][str(interaction.user.id)]
-            except:
-                score = 0
-            stats['scores'][str(interaction.user.id)] = score + amnt
-            await interaction.response.edit_message(embed=embed, view=None, content=None)
-            print('crime (' + str(amnt) + '): ' + interaction.user.name)
-            
-            self.stop()
-        else:
-            await interaction.response.send_message('Not your prompt', ephemeral=True)
-    @discord.ui.button(label="bite full kitkat", style=discord.ButtonStyle.blurple)
-    async def arson(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id == self.author:
-            good = pr.prob(3/4)
-            if good:
-                embed = discord.Embed(
-                    title="bite full kitkat",
-                    color=discord.Color.green(),
-                )
-                amnt = rand.randrange(1,35)
-                embed.add_field(name="Win", value=f"Someone gave {amnt} points for you being brave", inline=False)
-            else:
-                embed = discord.Embed(
-                    title="bite full kitkat",
-                    color=discord.Color.red(),
-                )
-                amnt = -2 
-                embed.add_field(name="Loss", value=f"You spent 2 points on the kitkat, and nobody cared", inline=False)
-            try:
-                score = stats['scores'][str(interaction.user.id)]
-            except:
-                score = 0
-            stats['scores'][str(interaction.user.id)] = score + amnt
-            await interaction.response.edit_message(embed=embed, view=None, content=None)
-            print('crime (' + str(amnt) + '): ' + interaction.user.name)
-            
-            self.stop()
-        else:
-            await interaction.response.send_message('Not your prompt', ephemeral=True)
+@tree.command(name='settings', description='Personal settings')
+async def settings(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="Settings",
+        description="Personal settings",
+        color=discord.Color.green(),
+    )
+    await interaction.response.send_message(embed=embed, view=UserSettings.UserSettingsMenu(), ephemeral=True)
 
-class SpecialCrimeMenu(discord.ui.View):
-    def __init__(self, author):
-        self.author = author
-        super().__init__()
-    @discord.ui.button(label="eat hotdog sideways", style=discord.ButtonStyle.blurple)
-    async def SidewaysHotdog(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id == self.author:
-            good = pr.prob(3/4)
-            if good:
+class UserSettings:
+    class UserSettingsMenu(discord.ui.View):
+        @discord.ui.select( 
+            placeholder = "Pick a setting", 
+            min_values = 1, 
+            max_values = 1, 
+            options = [ 
+                discord.SelectOption(
+                    label="Notifications",
+                    description="Notifies you of /steal",
+                    emoji='🔔'
+                ),
+                discord.SelectOption(
+                    label="Consent",
+                    description="Allows usage of the bot",
+                    emoji='✅'
+                )
+            ]
+        )
+        async def select_callback(self, interaction, select): # https://discordpy.readthedocs.io/en/stable/interactions/api.html#discord.Interaction
+            if select.values[0] == "Notifications":
+                # Create embed
                 embed = discord.Embed(
-                    title="Sideways hotdog",
+                    title="Settings",
+                    description="Notifications",
                     color=discord.Color.green(),
                 )
-                amnt = rand.randrange(5,30)
-                embed.add_field(name="Win", value=f"You successfully got {amnt} points from people begging you to go away", inline=False)
-            else:
-                embed = discord.Embed(
-                    title="Sideways hotdog",
-                    color=discord.Color.red(),
-                )
-                amnt = 0
-                embed.add_field(name="Loss", value=f"Nobody cared", inline=False)
-            try:
-                score = stats['scores'][str(interaction.user.id)]
-            except:
-                score = 0
-            stats['scores'][str(interaction.user.id)] = score + amnt
-            await interaction.response.edit_message(embed=embed, view=None, content=None)
-            print('crime special (' + str(amnt) + '): ' + interaction.user.name)
-            
+                try:
+                    stats['usersettings'][str(interaction.user.id)]['notifications']
+                    if stats['usersettings'][str(interaction.user.id)]['notifications'] == 0:
+                        embed.add_field(name="Status", value="Disabled", inline=False)  
+                    elif stats['usersettings'][str(interaction.user.id)]['notifications'] == 1:
+                        embed.add_field(name="Status", value="Enabled when offline", inline=False)
+                    elif stats['usersettings'][str(interaction.user.id)]['notifications'] == 2:
+                        embed.add_field(name="Status", value="Enabled", inline=False)
+                except KeyError:
+                    embed.add_field(name="Status", value="Disabled", inline=False)
+                    stats['usersettings'][str(interaction.user.id)] = {'notifications': 0}
+                # Edit message
+                await interaction.response.edit_message(view=UserSettings.Notifications(), embed=embed)
+                
+        @discord.ui.button(label="Exit", style=discord.ButtonStyle.red, row=2)
+        async def settingsexit(self, interaction: discord.Interaction, button: discord.ui.Button):
+            # Create embed
+            embed = discord.Embed(
+                title="Settings",
+                description="Personal settings (dismissed)",
+                color=discord.Color.red(),
+            )
+            # Disable all buttons
+            view = UserSettings.UserSettingsMenu()
+            for item in view.children:
+                item.disabled = True
+            # Send message
+            await interaction.response.edit_message(view=view, embed=embed)
+            # Stop view
             self.stop()
-        else:
-            await interaction.response.send_message('Not your prompt', ephemeral=True)
-    @discord.ui.button(label="bite full kitkat", style=discord.ButtonStyle.blurple)
-    async def arson(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id == self.author:
-            good = pr.prob(3/4)
-            if good:
-                embed = discord.Embed(
-                    title="bite full kitkat",
-                    color=discord.Color.green(),
-                )
-                amnt = rand.randrange(1,35)
-                embed.add_field(name="Win", value=f"Someone gave {amnt} points for you being brave", inline=False)
-            else:
-                embed = discord.Embed(
-                    title="bite full kitkat",
-                    color=discord.Color.red(),
-                )
-                amnt = -2 
-                embed.add_field(name="Loss", value=f"You spent 2 points on the kitkat, and nobody cared", inline=False)
+
+    class Notifications(discord.ui.View):
+        @discord.ui.button(label="Enable", style=discord.ButtonStyle.green)
+        async def enable(self, interaction: discord.Interaction, button: discord.ui.Button):
+            # Set notifications to 2
             try:
-                score = stats['scores'][str(interaction.user.id)]
-            except:
-                score = 0
-            stats['scores'][str(interaction.user.id)] = score + amnt
-            await interaction.response.edit_message(embed=embed, view=None, content=None)
-            print('crime (' + str(amnt) + '): ' + interaction.user.name)
-            
-            self.stop()
-        else:
-            await interaction.response.send_message('Not your prompt', ephemeral=True)
-    @discord.ui.button(label="finding who asked", style=discord.ButtonStyle.green)
-    async def special(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id == self.author:
-            good = pr.prob(2/3)
-            if good:
-                embed = discord.Embed(
-                    title="who asked",
-                    color=discord.Color.green(),
-                )
-                amnt = rand.randrange(30,85)
-                embed.add_field(name="Win", value=f"You found who asked, and got {str(amnt)} points", inline=False)
-            else:
-                embed = discord.Embed(
-                    title="who asked",
-                    color=discord.Color.red(),
-                )
-                amnt = 0
-                embed.add_field(name="Loss", value=f"Nobody asked, and you got nothing.", inline=False)
+                stats['usersettings'][str(interaction.user.id)]['notifications'] = 2
+            except KeyError:
+                stats['usersettings'][str(interaction.user.id)] = {'notifications': 2}
+            # Create embed
+            embed = discord.Embed(
+                title="Settings",
+                description="Notifications",
+                color=discord.Color.green(),
+            )
+            # Edit message
+            embed.add_field(name="Status", value="Enabled", inline=False)
+            await interaction.response.edit_message(embed=embed)
+        @discord.ui.button(label="While offline", style=discord.ButtonStyle.blurple)
+        async def notifsoffline(self, interaction: discord.Interaction, button: discord.ui.Button):
+            # Set notifications to 1
             try:
-                score = stats['scores'][str(interaction.user.id)]
-            except:
-                score = 0
-            stats['scores'][str(interaction.user.id)] = score + amnt
-            await interaction.response.edit_message(embed=embed, view=None, content=None)
-            print('crime special option (' + str(amnt) + '): ' + interaction.user.name)
-            
-            self.stop()
-        else:
-            await interaction.response.send_message('Not your prompt', ephemeral=True)
+                stats['usersettings'][str(interaction.user.id)]['notifications'] = 1
+            except KeyError:
+                stats['usersettings'][str(interaction.user.id)] = {'notifications': 1}
+            # Create embed
+            embed = discord.Embed(
+                title="Settings",
+                description="Notifications",
+                color=discord.Color.yellow(),
+            )
+            # Edit message
+            embed.add_field(name="Status", value="Enabled when offline", inline=False)
+            await interaction.response.edit_message(embed=embed)
+        @discord.ui.button(label="Disable", style=discord.ButtonStyle.red)
+        async def disabled(self, interaction: discord.Interaction, button: discord.ui.Button):
+            # Set notifications to 0
+            try:
+                stats['usersettings'][str(interaction.user.id)]['notifications'] = 0
+            except KeyError:
+                stats['usersettings'][str(interaction.user.id)] = {'notifications': 0}
+            # Create embed
+            embed = discord.Embed(
+                title="Settings",
+                description="Notifications",
+                color=discord.Color.red(),
+            )
+            # Edit message
+            embed.add_field(name="Status", value="Disabled", inline=False)
+            await interaction.response.edit_message(embed=embed)
+        @discord.ui.button(label="Back", style=discord.ButtonStyle.red, row=2)
+        async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+            # Create embed
+            embed = discord.Embed(
+                title="Settings",
+                description="Personal settings",
+                color=discord.Color.green(),
+            )
+            # Disable all buttons
+            view = UserSettings.UserSettingsMenu()
+            # Send message
+            await interaction.response.edit_message(view=view, embed=embed)
 
 @tree.command(name='beg', description='Beg for money')
 @app_commands.checks.cooldown(1, 25, key=lambda i: (i.user.id))
@@ -759,10 +746,166 @@ async def give(interaction: discord.Interaction, user: discord.User, amount: int
 async def crime(interaction: discord.Interaction):
     await interaction.response.defer()
     if pr.prob(9/10):
-        view = CrimeMenu(interaction.user.id)
+        view = CrimeMenuTotal.CrimeMenu(interaction.user.id)
     else:
-        view = SpecialCrimeMenu(interaction.user.id)
+        view = CrimeMenuTotal.SpecialCrimeMenu(interaction.user.id)
     await interaction.followup.send(f"{interaction.user.mention} is running a command", view=view)
+
+class CrimeMenuTotal(discord.ui.View):
+    class CrimeMenu(discord.ui.View):
+        def __init__(self, author):
+            self.author = author
+            super().__init__()
+        @discord.ui.button(label="eat hotdog sideways", style=discord.ButtonStyle.blurple)
+        async def SidewaysHotdog(self, interaction: discord.Interaction, button: discord.ui.Button):
+            if interaction.user.id == self.author:
+                good = pr.prob(3/4)
+                if good:
+                    embed = discord.Embed(
+                        title="Sideways hotdog",
+                        color=discord.Color.green(),
+                    )
+                    amnt = rand.randrange(1,25)
+                    embed.add_field(name="Win", value=f"You successfully got {amnt} points from people begging you to go away", inline=False)
+                else:
+                    embed = discord.Embed(
+                        title="Sideways hotdog",
+                        color=discord.Color.red(),
+                    )
+                    amnt = 0
+                    embed.add_field(name="Loss", value=f"Nobody cared", inline=False)
+                try:
+                    score = stats['scores'][str(interaction.user.id)]
+                except:
+                    score = 0
+                stats['scores'][str(interaction.user.id)] = score + amnt
+                await interaction.response.edit_message(embed=embed, view=None, content=None)
+                print('crime (' + str(amnt) + '): ' + interaction.user.name)
+                
+                self.stop()
+            else:
+                await interaction.response.send_message('Not your prompt', ephemeral=True)
+        @discord.ui.button(label="bite full kitkat", style=discord.ButtonStyle.blurple)
+        async def arson(self, interaction: discord.Interaction, button: discord.ui.Button):
+            if interaction.user.id == self.author:
+                good = pr.prob(3/4)
+                if good:
+                    embed = discord.Embed(
+                        title="bite full kitkat",
+                        color=discord.Color.green(),
+                    )
+                    amnt = rand.randrange(1,35)
+                    embed.add_field(name="Win", value=f"Someone gave {amnt} points for you being brave", inline=False)
+                else:
+                    embed = discord.Embed(
+                        title="bite full kitkat",
+                        color=discord.Color.red(),
+                    )
+                    amnt = -2 
+                    embed.add_field(name="Loss", value=f"You spent 2 points on the kitkat, and nobody cared", inline=False)
+                try:
+                    score = stats['scores'][str(interaction.user.id)]
+                except:
+                    score = 0
+                stats['scores'][str(interaction.user.id)] = score + amnt
+                await interaction.response.edit_message(embed=embed, view=None, content=None)
+                print('crime (' + str(amnt) + '): ' + interaction.user.name)
+                
+                self.stop()
+            else:
+                await interaction.response.send_message('Not your prompt', ephemeral=True)
+
+    class SpecialCrimeMenu(discord.ui.View):
+        def __init__(self, author):
+            self.author = author
+            super().__init__()
+        @discord.ui.button(label="eat hotdog sideways", style=discord.ButtonStyle.blurple)
+        async def SidewaysHotdog(self, interaction: discord.Interaction, button: discord.ui.Button):
+            if interaction.user.id == self.author:
+                good = pr.prob(3/4)
+                if good:
+                    embed = discord.Embed(
+                        title="Sideways hotdog",
+                        color=discord.Color.green(),
+                    )
+                    amnt = rand.randrange(5,30)
+                    embed.add_field(name="Win", value=f"You successfully got {amnt} points from people begging you to go away", inline=False)
+                else:
+                    embed = discord.Embed(
+                        title="Sideways hotdog",
+                        color=discord.Color.red(),
+                    )
+                    amnt = 0
+                    embed.add_field(name="Loss", value=f"Nobody cared", inline=False)
+                try:
+                    score = stats['scores'][str(interaction.user.id)]
+                except:
+                    score = 0
+                stats['scores'][str(interaction.user.id)] = score + amnt
+                await interaction.response.edit_message(embed=embed, view=None, content=None)
+                print('crime special (' + str(amnt) + '): ' + interaction.user.name)
+                
+                self.stop()
+            else:
+                await interaction.response.send_message('Not your prompt', ephemeral=True)
+        @discord.ui.button(label="bite full kitkat", style=discord.ButtonStyle.blurple)
+        async def arson(self, interaction: discord.Interaction, button: discord.ui.Button):
+            if interaction.user.id == self.author:
+                good = pr.prob(3/4)
+                if good:
+                    embed = discord.Embed(
+                        title="bite full kitkat",
+                        color=discord.Color.green(),
+                    )
+                    amnt = rand.randrange(1,35)
+                    embed.add_field(name="Win", value=f"Someone gave {amnt} points for you being brave", inline=False)
+                else:
+                    embed = discord.Embed(
+                        title="bite full kitkat",
+                        color=discord.Color.red(),
+                    )
+                    amnt = -2 
+                    embed.add_field(name="Loss", value=f"You spent 2 points on the kitkat, and nobody cared", inline=False)
+                try:
+                    score = stats['scores'][str(interaction.user.id)]
+                except:
+                    score = 0
+                stats['scores'][str(interaction.user.id)] = score + amnt
+                await interaction.response.edit_message(embed=embed, view=None, content=None)
+                print('crime (' + str(amnt) + '): ' + interaction.user.name)
+                
+                self.stop()
+            else:
+                await interaction.response.send_message('Not your prompt', ephemeral=True)
+        @discord.ui.button(label="finding who asked", style=discord.ButtonStyle.green)
+        async def special(self, interaction: discord.Interaction, button: discord.ui.Button):
+            if interaction.user.id == self.author:
+                good = pr.prob(2/3)
+                if good:
+                    embed = discord.Embed(
+                        title="who asked",
+                        color=discord.Color.green(),
+                    )
+                    amnt = rand.randrange(30,85)
+                    embed.add_field(name="Win", value=f"You found who asked, and got {str(amnt)} points", inline=False)
+                else:
+                    embed = discord.Embed(
+                        title="who asked",
+                        color=discord.Color.red(),
+                    )
+                    amnt = 0
+                    embed.add_field(name="Loss", value=f"Nobody asked, and you got nothing.", inline=False)
+                try:
+                    score = stats['scores'][str(interaction.user.id)]
+                except:
+                    score = 0
+                stats['scores'][str(interaction.user.id)] = score + amnt
+                await interaction.response.edit_message(embed=embed, view=None, content=None)
+                print('crime special option (' + str(amnt) + '): ' + interaction.user.name)
+                
+                self.stop()
+            else:
+                await interaction.response.send_message('Not your prompt', ephemeral=True)
 
 @tree.command(name = "leaderboard", description = "Global leaderboard") #int(str(x)[-1]) gives the last digit of the int 'x'
 @app_commands.checks.cooldown(2, 75, key=lambda i: (i.user.id))
