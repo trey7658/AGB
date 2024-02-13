@@ -144,6 +144,15 @@ async def on_message(message):
                     score = 0
                 stats['scores'][str(message.author.id)] = score + 10
     if f'{message.guild}' == 'None':
+        if message.author == private["ownerid"]:
+            if message.content.startswith(f'exec {private["sudo-pin"]} '):
+                msg = message.content.removeprefix(f'exec {private["sudo-pin"]} ')
+                var = None
+                exec(f'var = {msg}')
+                try:
+                    await message.channel.send(f'```{var}```', reference=message)
+                except Exception as exception:
+                    await message.channel.send('Could not parse result: ' + exception, reference=message)
         if not {message.author} == {client.user}:
             if message.content == ':newspaper:' or message.content == '<a:RPS_paper:1175245811282628628>' or message.content == '📰' or message.content == '📄' or message.content == '🪨' or message.content == '<a:RPS_rock:1175245831398510704>' or message.content == ':rock:' or message.content == '✂️' or message.content == '<a:RPS_scissors:1175245784380346549>' or message.content == ':scissors:':
                 rpscore = rand.randrange(1,4)
