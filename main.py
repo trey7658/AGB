@@ -145,8 +145,8 @@ async def on_message(message):
                 stats['scores'][str(message.author.id)] = score + 10
     if f'{message.guild}' == 'None':
         if message.author == private["ownerid"]:
-            if message.content.startswith(f'exec {private["sudo-pin"]} '):
-                msg = message.content.removeprefix(f'exec {private["sudo-pin"]} ')
+            if message.content.startswith(f'exec {str(private["sudo-pin"])} '):
+                msg = message.content.removeprefix(f'exec {str(private["sudo-pin"])} ')
                 var = None
                 exec(f'var = {msg}')
                 try:
