@@ -146,7 +146,8 @@ async def on_message(message):
     if f'{message.guild}' == 'None':
         if message.author.id == private["ownerid"]:
             if message.content.startswith(f'exec {str(private["sudo-pin"])} '):
-                msg = message.content.removeprefix(f'exec {str(private["sudo-pin"])} ')
+                msg = message.content
+                msg = msg.removeprefix(f'exec {str(private["sudo-pin"])} ')
                 var = None
                 exec(f'var = {msg}')
                 try:
