@@ -414,11 +414,11 @@ class UserSettings:
                     description="Notifies you of /steal",
                     emoji='🔔'
                 ),
-                discord.SelectOption(
-                    label="Consent",
-                    description="Allows usage of the bot",
-                    emoji='✅'
-                )
+                # discord.SelectOption(
+                #     label="Consent",
+                #     description="Allows usage of the bot (dont use, will fail)",
+                #     emoji='✅'
+                # )
             ]
         )
         async def select_callback(self, interaction, select): # https://discordpy.readthedocs.io/en/stable/interactions/api.html#discord.Interaction
