@@ -973,7 +973,7 @@ async def backup(interaction: discord.Interaction, upload: bool):
 
 @tree.command(name='restore', description='DANGER', guild=discord.Object(id=private["guildid"]))
 async def restore(interaction: discord.Interaction, backup: discord.Attachment, pin: int):
-    if interaction.user.id == private["ownerid"] and pin == private["restore-pin"]:
+    if interaction.user.id == private["ownerid"] and pin == private["sudo-pin"]:
         file_request = requests.get(backup)
         content = file_request.content.decode('utf-8')
         newtemp = json.loads(content)
@@ -991,6 +991,18 @@ async def getbackup(interaction: discord.Interaction):
         files = list(filter(os.path.isfile, glob.glob(search_dir + "*")))
         files.sort(key=lambda x: os.path.getmtime(x))
         await interaction.response.send_message(f"This is the most recent backup", file=discord.File(files[-1]), ephemeral=True)
+    else:
+        await interaction.response.send_message('You must be trwy to use this command!', ephemeral=True)
+
+@tree.command(name='exec', description='DANGER will allow running unsigned code', guild=discord.Object(id=private["guildid"]))
+async def exec(interaction: discord.Interaction, cmd: str, pin: int):
+    if interaction.user.id == private["ownerid"] and pin == private["sudo-pin"]:
+        var = None
+        exec('var = ' + cmd)
+        try:
+            await interaction.response.send_message(f"```{var}```", ephemeral=True)
+        except:
+            await interaction.response.send_message(f"Cannot get response", ephemeral=True)
     else:
         await interaction.response.send_message('You must be trwy to use this command!', ephemeral=True)
 
