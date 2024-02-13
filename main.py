@@ -463,11 +463,27 @@ class UserSettings:
     class Notifications(discord.ui.View):
         @discord.ui.button(label="Enable", style=discord.ButtonStyle.green)
         async def enable(self, interaction: discord.Interaction, button: discord.ui.Button):
-            # Set notifications to 2
+            # Check if user can be notified
             try:
-                stats['usersettings'][str(interaction.user.id)]['notifications'] = 2
-            except KeyError:
-                stats['usersettings'][str(interaction.user.id)] = {'notifications': 2}
+                await interaction.user.send(f"This is a test notification to demonstrate the bot's ability to notify you of /steal: {client.user.mention} has stolen 10 points from you in {interaction.guild.name} at {interaction.channel.mention}")
+                # Set notifications to 2
+                try:
+                    stats['usersettings'][str(interaction.user.id)]['notifications'] = 2
+                except KeyError:
+                    stats['usersettings'][str(interaction.user.id)] = {'notifications': 2}
+            except discord.errors.Forbidden:
+                embed = discord.Embed(
+                    title="Settings",
+                    description="Notifications",
+                    color=discord.Color.red(),
+                )
+                embed.add_field(name="Status", value="Disabled", inline=False)
+                await interaction.response.edit_message("You cannot be notified, please enable DMs in Server > Privacy settings > Direct messages", ephemeral=True)
+                try:
+                    stats['usersettings'][str(interaction.user.id)]['notifications'] = 0
+                except KeyError:
+                    stats['usersettings'][str(interaction.user.id)] = {'notifications': 0}
+                return
             # Create embed
             embed = discord.Embed(
                 title="Settings",
@@ -479,11 +495,27 @@ class UserSettings:
             await interaction.response.edit_message(embed=embed)
         @discord.ui.button(label="While offline", style=discord.ButtonStyle.blurple)
         async def notifsoffline(self, interaction: discord.Interaction, button: discord.ui.Button):
-            # Set notifications to 1
+            # Check if user can be notified
             try:
-                stats['usersettings'][str(interaction.user.id)]['notifications'] = 1
-            except KeyError:
-                stats['usersettings'][str(interaction.user.id)] = {'notifications': 1}
+                await interaction.user.send(f"This is a test notification to demonstrate the bot's ability to notify you of /steal: {client.user.mention} has stolen 10 points from you in {interaction.guild.name} at {interaction.channel.mention}")
+                # Set notifications to 2
+                try:
+                    stats['usersettings'][str(interaction.user.id)]['notifications'] = 1
+                except KeyError:
+                    stats['usersettings'][str(interaction.user.id)] = {'notifications': 1}
+            except discord.errors.Forbidden:
+                embed = discord.Embed(
+                    title="Settings",
+                    description="Notifications",
+                    color=discord.Color.red(),
+                )
+                embed.add_field(name="Status", value="Disabled", inline=False)
+                await interaction.response.edit_message("You cannot be notified, please enable DMs in Server > Privacy settings > Direct messages", ephemeral=True)
+                try:
+                    stats['usersettings'][str(interaction.user.id)]['notifications'] = 0
+                except KeyError:
+                    stats['usersettings'][str(interaction.user.id)] = {'notifications': 0}
+                return
             # Create embed
             embed = discord.Embed(
                 title="Settings",
