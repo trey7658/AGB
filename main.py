@@ -645,10 +645,12 @@ async def steal(interaction: discord.Interaction, user: discord.Member):
                             stealamount = round(stealamount[0])
                         print('steal (' + str(stealamount) + '): ' + interaction.user.name + ' - from - ' + persontemp.name)
                     else:
+                        print('steal fail')
                         if stats['scores'][str(persontemp.id)] > 0:
                             stealamount = round(rand.randrange(stats['scores'][str(persontemp.id)]//10, stats['scores'][str(persontemp.id)] //5)) * -1
                         else:
                             stealamount = round(rand.randrange(stats['scores'][str(persontemp.id)]//5, stats['scores'][str(persontemp.id)]//10))
+                        print('steal fail finished')
                     score = stats['scores'][str(interaction.user.id)]            
                     stats['scores'][str(interaction.user.id)] = score + stealamount
                     score = stats['scores'][str(persontemp.id)]
@@ -659,6 +661,7 @@ async def steal(interaction: discord.Interaction, user: discord.Member):
                         color=discord.Color.green() if stealamount > 0 else discord.Color.red(),
                     )
                     embed.add_field(name="Amount", value=f"{str(stealamount)} points were stolen from {persontemp.mention}" if stealamount > 0 else f"{str(abs(stealamount))} was taken from {interaction.user.mention} and given to {persontemp.mention}", inline=False)
+                    embed.add_field(name="⚠️", value="/steal is currently unstable, it may fail to run at any time.", inline=False)
                     await interaction.followup.send(embed=embed)
                     if stats['usersettings'][str(persontemp.id)]['notifications'] == True:
                         try:
