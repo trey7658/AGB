@@ -660,42 +660,54 @@ async def steal(interaction: discord.Interaction, user: discord.Member):
                     await interaction.response.send_message(f'Something went wrong, this person has not used {client.user.name} yet (Try another person).', ephemeral=True)
                     return
                 if not persontemp == interaction.user:
-                    if not persontemp.bot:
-                        await interaction.response.defer(ephemeral=False)
-                        if pr.prob(2/5) and stats['scores'][str(persontemp.id)] > 0:
-                            # https://stackoverflow.com/a/72904834
-                            # Will create a random number based on a probability
-                            stealamount = rand.choices([rand.randrange(stats['scores'][str(persontemp.id)] // 12, stats['scores'][str(persontemp.id)] // 11, rand.randrange(stats['scores'][str(persontemp.id)] // 10, stats['scores'][str(persontemp.id)] // 9)), rand.randrange(stats['scores'][str(persontemp.id)] // 8, stats['scores'][str(persontemp.id)] // 7), rand.randrange(stats['scores'][str(persontemp.id)] // 6, stats['scores'][str(persontemp.id)] // 5), rand.randrange(stats['scores'][str(persontemp.id)] // 4, stats['scores'][str(persontemp.id)] // 3), rand.randrange(stats['scores'][str(persontemp.id)] // 2, stats['scores'][str(persontemp.id)] // 1.75)], [0.60, 0.20, 0.10, 0.05, 0.03, 0.02])
-                            #stealamount = rand.randrange(stats['scores'][str(persontemp.id)]//12, stats['scores'][str(persontemp.id)]//2)
-                            print('steal (' + str(stealamount) + '): ' + interaction.user.name + ' - from - ' + persontemp.name)
-                            try:
-                                score = stats['scores'][str(interaction.user.id)]
-                            except:
-                                score = 0
-                            stats['scores'][str(interaction.user.id)] = score + stealamount
-                            stats['scores'][str(persontemp.id)] = score - stealamount
-                        else:
-                            stealamount = round(rand.random(stats['scores'][str(persontemp.id)]//10, stats['scores'][str(persontemp.id)] //5)) * -1
-                        embed = discord.Embed(
-                            title="Steal",
-                            description=f"{interaction.user.mention} stole from {persontemp.mention}" if stealamount > 0 else f"{interaction.user.mention} tried to steal from {persontemp.mention}",
-                            color=discord.Color.green() if stealamount > 0 else discord.Color.red(),
+                    await interaction.response.defer(ephemeral=False)
+                    if pr.prob(2/5) and (stats['scores'][str(persontemp.id)] > 0):
+                        # https://stackoverflow.com/a/72904834
+                        # Will create a random number based on a probability
+                        stealamount = rand.choices(
+                            [
+                                rand.randrange(stats['scores'][str(persontemp.id)] // 12, stats['scores'][str(persontemp.id)] // 11),
+                                rand.randrange(stats['scores'][str(persontemp.id)] // 10, stats['scores'][str(persontemp.id)] // 9),
+                                rand.randrange(stats['scores'][str(persontemp.id)] // 8, stats['scores'][str(persontemp.id)] // 7),
+                                rand.randrange(stats['scores'][str(persontemp.id)] // 6, stats['scores'][str(persontemp.id)] // 5),
+                                rand.randrange(stats['scores'][str(persontemp.id)] // 4, stats['scores'][str(persontemp.id)] // 3),
+                                rand.randrange(int(stats['scores'][str(persontemp.id)] // 2), int(stats['scores'][str(persontemp.id)] // 1.75))
+                            ],
+                            [0.60, 0.20, 0.10, 0.05, 0.03, 0.02]
                         )
-                        embed.add_field(name="Amount", value=f"{stealamount} points were stolen from {persontemp.mention}" if stealamount > 0 else f"{stealamount} was taken from {interaction.user.mention} and given to {persontemp.mention}", inline=False)
-                        await interaction.followup.send(embed=embed)
-                        if stats['usersettings'][str(persontemp.id)]['notifications'] == 2:
+                        #stealamount = rand.randrange(stats['scores'][str(persontemp.id)]//12, stats['scores'][str(persontemp.id)]//2)
+                        if isinstance(stealamount, list):
+                            stealamount = round(stealamount[0])
+                        print('steal (' + str(stealamount) + '): ' + interaction.user.name + ' - from - ' + persontemp.name)
+                        try:
+                            score = stats['scores'][str(interaction.user.id)]
+                        except:
+                            score = 0
+                    else:
+                        if stats['scores'][str(persontemp.id)] > 0:
+                            stealamount = round(rand.randrange(stats['scores'][str(persontemp.id)]//10, stats['scores'][str(persontemp.id)] //5)) * -1
+                        else:
+                            stealamount = round(rand.randrange(stats['scores'][str(persontemp.id)]//5, stats['scores'][str(persontemp.id)]//10))
+                    stats['scores'][str(interaction.user.id)] = score + stealamount
+                    stats['scores'][str(persontemp.id)] = score - stealamount
+                    embed = discord.Embed(
+                        title="Steal",
+                        description=f"{interaction.user.mention} stole from {persontemp.mention}" if stealamount > 0 else f"{interaction.user.mention} tried to steal from {persontemp.mention}",
+                        color=discord.Color.green() if stealamount > 0 else discord.Color.red(),
+                    )
+                    embed.add_field(name="Amount", value=f"{str(stealamount)} points were stolen from {persontemp.mention}" if stealamount > 0 else f"{str(abs(stealamount))} was taken from {interaction.user.mention} and given to {persontemp.mention}", inline=False)
+                    await interaction.followup.send(embed=embed)
+                    if stats['usersettings'][str(persontemp.id)]['notifications'] == 2:
+                        try:
+                            await persontemp.send(f"{client.user.mention} has stolen {stealamount} points from you in {interaction.guild.name} at {interaction.channel.mention}")
+                        except discord.errors.Forbidden:
+                            pass
+                    elif stats['usersettings'][str(persontemp.id)]['notifications'] == 1:
+                        if persontemp.status == discord.Status.offline:
                             try:
-                                await persontemp.send(f"{client.user.mention} has stolen {stealamount} points from you in {interaction.guild.name} at {interaction.channel.mention}")
+                                await persontemp.send(f"{client.user.mention} has stolen {stealamount} points from you in {interaction.guild.name} at {interaction.channel.mention} (you were offline)")
                             except discord.errors.Forbidden:
                                 pass
-                        elif stats['usersettings'][str(persontemp.id)]['notifications'] == 1:
-                            if persontemp.status == discord.Status.offline:
-                                try:
-                                    await persontemp.send(f"{client.user.mention} has stolen {stealamount} points from you in {interaction.guild.name} at {interaction.channel.mention} (you were offline)")
-                                except discord.errors.Forbidden:
-                                    pass
-                    else:
-                        await interaction.response.send_message("Bots cannot get points", ephemeral=True)
                 else:
                     await interaction.response.send_message("You cannot steal from yourself", ephemeral=True)
                 
