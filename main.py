@@ -1,6 +1,6 @@
 import os
 try:
-    import discord, sys, asyncio, shelve, oyaml, json, atexit, glob, filecmp, requests, os.path, shutil, datetime, platform
+    import discord, sys, asyncio, shelve, oyaml, json, pprint, glob, requests, atexit, filecmp, os.path, shutil, datetime, platform
     from discord.utils import get
     from discord import app_commands, Interaction
     from pyprobs import Probability as pr
@@ -13,7 +13,6 @@ except ModuleNotFoundError:
     print('not all packages have been installed')
 print('Loading intents and discord client')
 intents = discord.Intents.default()
-intents.members = True
 client = discord.Client(intents=intents)
 tree = discord.app_commands.CommandTree(client)
 try:
@@ -435,23 +434,20 @@ class UserSettings:
         )
         async def select_callback(self, interaction, select): # https://discordpy.readthedocs.io/en/stable/interactions/api.html#discord.Interaction
             if select.values[0] == "Notifications":
+                try:
+                    stats['usersettings'][str(interaction.user.id)]['notifications']
+                except KeyError:
+                    stats['usersettings'][str(interaction.user.id)] = {'notifications': False}
                 # Create embed
                 embed = discord.Embed(
                     title="Settings",
                     description="Notifications",
-                    color=discord.Color.green(),
+                    color=discord.Color.green() if stats['usersettings'][str(interaction.user.id)]['notifications'] == True else discord.Color.red(),
                 )
-                try:
-                    stats['usersettings'][str(interaction.user.id)]['notifications']
-                    if stats['usersettings'][str(interaction.user.id)]['notifications'] == 0:
-                        embed.add_field(name="Status", value="Disabled", inline=False)  
-                    elif stats['usersettings'][str(interaction.user.id)]['notifications'] == 1:
-                        embed.add_field(name="Status", value="Enabled when offline", inline=False)
-                    elif stats['usersettings'][str(interaction.user.id)]['notifications'] == 2:
-                        embed.add_field(name="Status", value="Enabled", inline=False)
-                except KeyError:
-                    embed.add_field(name="Status", value="Disabled", inline=False)
-                    stats['usersettings'][str(interaction.user.id)] = {'notifications': 0}
+                if stats['usersettings'][str(interaction.user.id)]['notifications'] == False:
+                    embed.add_field(name="Status", value="Disabled", inline=False)  
+                elif stats['usersettings'][str(interaction.user.id)]['notifications'] == True:
+                    embed.add_field(name="Status", value="Enabled", inline=False)
                 # Edit message
                 await interaction.response.edit_message(view=UserSettings.Notifications(), embed=embed)
                 
@@ -478,11 +474,10 @@ class UserSettings:
             # Check if user can be notified
             try:
                 await interaction.user.send(f"This is a test notification to demonstrate the bot's ability to notify you of /steal: {client.user.mention} has stolen 10 points from you in {interaction.guild.name} at {interaction.channel.mention}")
-                # Set notifications to 2
                 try:
-                    stats['usersettings'][str(interaction.user.id)]['notifications'] = 2
+                    stats['usersettings'][str(interaction.user.id)]['notifications'] = True
                 except KeyError:
-                    stats['usersettings'][str(interaction.user.id)] = {'notifications': 2}
+                    stats['usersettings'][str(interaction.user.id)] = {'notifications': True}
             except discord.errors.Forbidden:
                 embed = discord.Embed(
                     title="Settings",
@@ -492,9 +487,9 @@ class UserSettings:
                 embed.add_field(name="Status", value="Disabled", inline=False)
                 await interaction.response.edit_message("You cannot be notified, please enable DMs in Server > Privacy settings > Direct messages", ephemeral=True)
                 try:
-                    stats['usersettings'][str(interaction.user.id)]['notifications'] = 0
+                    stats['usersettings'][str(interaction.user.id)]['notifications'] = False
                 except KeyError:
-                    stats['usersettings'][str(interaction.user.id)] = {'notifications': 0}
+                    stats['usersettings'][str(interaction.user.id)] = {'notifications': False}
                 return
             # Create embed
             embed = discord.Embed(
@@ -505,45 +500,13 @@ class UserSettings:
             # Edit message
             embed.add_field(name="Status", value="Enabled", inline=False)
             await interaction.response.edit_message(embed=embed)
-        @discord.ui.button(label="While offline", style=discord.ButtonStyle.blurple)
-        async def notifsoffline(self, interaction: discord.Interaction, button: discord.ui.Button):
-            # Check if user can be notified
-            try:
-                await interaction.user.send(f"This is a test notification to demonstrate the bot's ability to notify you of /steal: {client.user.mention} has stolen 10 points from you in {interaction.guild.name} at {interaction.channel.mention}")
-                # Set notifications to 2
-                try:
-                    stats['usersettings'][str(interaction.user.id)]['notifications'] = 1
-                except KeyError:
-                    stats['usersettings'][str(interaction.user.id)] = {'notifications': 1}
-            except discord.errors.Forbidden:
-                embed = discord.Embed(
-                    title="Settings",
-                    description="Notifications",
-                    color=discord.Color.red(),
-                )
-                embed.add_field(name="Status", value="Disabled", inline=False)
-                await interaction.response.edit_message("You cannot be notified, please enable DMs in Server > Privacy settings > Direct messages", ephemeral=True)
-                try:
-                    stats['usersettings'][str(interaction.user.id)]['notifications'] = 0
-                except KeyError:
-                    stats['usersettings'][str(interaction.user.id)] = {'notifications': 0}
-                return
-            # Create embed
-            embed = discord.Embed(
-                title="Settings",
-                description="Notifications",
-                color=discord.Color.yellow(),
-            )
-            # Edit message
-            embed.add_field(name="Status", value="Enabled when offline", inline=False)
-            await interaction.response.edit_message(embed=embed)
         @discord.ui.button(label="Disable", style=discord.ButtonStyle.red)
         async def disabled(self, interaction: discord.Interaction, button: discord.ui.Button):
             # Set notifications to 0
             try:
-                stats['usersettings'][str(interaction.user.id)]['notifications'] = 0
+                stats['usersettings'][str(interaction.user.id)]['notifications'] = False
             except KeyError:
-                stats['usersettings'][str(interaction.user.id)] = {'notifications': 0}
+                stats['usersettings'][str(interaction.user.id)] = {'notifications': False}
             # Create embed
             embed = discord.Embed(
                 title="Settings",
@@ -696,17 +659,11 @@ async def steal(interaction: discord.Interaction, user: discord.Member):
                     )
                     embed.add_field(name="Amount", value=f"{str(stealamount)} points were stolen from {persontemp.mention}" if stealamount > 0 else f"{str(abs(stealamount))} was taken from {interaction.user.mention} and given to {persontemp.mention}", inline=False)
                     await interaction.followup.send(embed=embed)
-                    if stats['usersettings'][str(persontemp.id)]['notifications'] == 2:
+                    if stats['usersettings'][str(persontemp.id)]['notifications'] == True:
                         try:
                             await persontemp.send(f"{interaction.user.mention} ({interaction.user.name}) has stolen {stealamount} points from you in {interaction.guild.name} at {interaction.channel.mention}")
                         except discord.errors.Forbidden:
                             pass
-                    elif stats['usersettings'][str(persontemp.id)]['notifications'] == 1:
-                        if persontemp.status == discord.Status.offline:
-                            try:
-                                await persontemp.send(f"{interaction.user.mention} ({interaction.user.name}) has stolen {stealamount} points from you in {interaction.guild.name} at {interaction.channel.mention} (you were offline)")
-                            except discord.errors.Forbidden:
-                                pass
                 else:
                     await interaction.response.send_message("You cannot steal from yourself", ephemeral=True)
                 
