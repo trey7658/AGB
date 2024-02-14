@@ -472,25 +472,26 @@ class UserSettings:
         @discord.ui.button(label="Enable", style=discord.ButtonStyle.green)
         async def enable(self, interaction: discord.Interaction, button: discord.ui.Button):
             # Check if user can be notified
-            try:
-                await interaction.user.send(f"This is a test notification to demonstrate the bot's ability to notify you of /steal: {client.user.mention} has stolen 10 points from you in {interaction.guild.name} at {interaction.channel.mention}")
+            if not stats['usersettings'][str(interaction.user.id)]['notifications'] == True:
                 try:
-                    stats['usersettings'][str(interaction.user.id)]['notifications'] = True
-                except KeyError:
-                    stats['usersettings'][str(interaction.user.id)] = {'notifications': True}
-            except discord.errors.Forbidden:
-                embed = discord.Embed(
-                    title="Settings",
-                    description="Notifications",
-                    color=discord.Color.red(),
-                )
-                embed.add_field(name="Status", value="Disabled", inline=False)
-                await interaction.response.edit_message("You cannot be notified, please enable DMs in Server > Privacy settings > Direct messages", ephemeral=True)
-                try:
-                    stats['usersettings'][str(interaction.user.id)]['notifications'] = False
-                except KeyError:
-                    stats['usersettings'][str(interaction.user.id)] = {'notifications': False}
-                return
+                    await interaction.user.send(f"This is a test notification to demonstrate the bot's ability to notify you of /steal: {client.user.mention} has stolen 10 points from you in {interaction.guild.name} at {interaction.channel.mention}")
+                    try:
+                        stats['usersettings'][str(interaction.user.id)]['notifications'] = True
+                    except KeyError:
+                        stats['usersettings'][str(interaction.user.id)] = {'notifications': True}
+                except discord.errors.Forbidden:
+                    embed = discord.Embed(
+                        title="Settings",
+                        description="Notifications",
+                        color=discord.Color.red(),
+                    )
+                    embed.add_field(name="Status", value="Disabled", inline=False)
+                    await interaction.response.edit_message("You cannot be notified, please enable DMs in Server > Privacy settings > Direct messages", ephemeral=True)
+                    try:
+                        stats['usersettings'][str(interaction.user.id)]['notifications'] = False
+                    except KeyError:
+                        stats['usersettings'][str(interaction.user.id)] = {'notifications': False}
+                    return
             # Create embed
             embed = discord.Embed(
                 title="Settings",
