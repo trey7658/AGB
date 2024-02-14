@@ -13,6 +13,7 @@ except ModuleNotFoundError:
     print('not all packages have been installed')
 print('Loading intents and discord client')
 intents = discord.Intents.default()
+intents.members = True
 client = discord.Client(intents=intents)
 tree = discord.app_commands.CommandTree(client)
 try:
@@ -666,11 +667,11 @@ async def steal(interaction: discord.Interaction, user: discord.Member):
                         # Will create a random number based on a probability
                         stealamount = rand.choices(
                             [
-                                rand.randrange(stats['scores'][str(persontemp.id)] // 12, stats['scores'][str(persontemp.id)] // 11),
-                                rand.randrange(stats['scores'][str(persontemp.id)] // 10, stats['scores'][str(persontemp.id)] // 9),
-                                rand.randrange(stats['scores'][str(persontemp.id)] // 8, stats['scores'][str(persontemp.id)] // 7),
-                                rand.randrange(stats['scores'][str(persontemp.id)] // 6, stats['scores'][str(persontemp.id)] // 5),
-                                rand.randrange(stats['scores'][str(persontemp.id)] // 4, stats['scores'][str(persontemp.id)] // 3),
+                                rand.randrange(int(stats['scores'][str(persontemp.id)] // 12), int(stats['scores'][str(persontemp.id)] // 11)),
+                                rand.randrange(int(stats['scores'][str(persontemp.id)] // 10), int(stats['scores'][str(persontemp.id)] // 9)),
+                                rand.randrange(int(stats['scores'][str(persontemp.id)] // 8), int(stats['scores'][str(persontemp.id)] // 7)),
+                                rand.randrange(int(stats['scores'][str(persontemp.id)] // 6), int(stats['scores'][str(persontemp.id)] // 5)),
+                                rand.randrange(int(stats['scores'][str(persontemp.id)] // 4), int(stats['scores'][str(persontemp.id)] // 3)),
                                 rand.randrange(int(stats['scores'][str(persontemp.id)] // 2), int(stats['scores'][str(persontemp.id)] // 1.75))
                             ],
                             [0.60, 0.20, 0.10, 0.05, 0.03, 0.02]
@@ -679,16 +680,14 @@ async def steal(interaction: discord.Interaction, user: discord.Member):
                         if isinstance(stealamount, list):
                             stealamount = round(stealamount[0])
                         print('steal (' + str(stealamount) + '): ' + interaction.user.name + ' - from - ' + persontemp.name)
-                        try:
-                            score = stats['scores'][str(interaction.user.id)]
-                        except:
-                            score = 0
                     else:
                         if stats['scores'][str(persontemp.id)] > 0:
                             stealamount = round(rand.randrange(stats['scores'][str(persontemp.id)]//10, stats['scores'][str(persontemp.id)] //5)) * -1
                         else:
                             stealamount = round(rand.randrange(stats['scores'][str(persontemp.id)]//5, stats['scores'][str(persontemp.id)]//10))
+                    score = stats['scores'][str(interaction.user.id)]            
                     stats['scores'][str(interaction.user.id)] = score + stealamount
+                    score = stats['scores'][str(persontemp.id)]
                     stats['scores'][str(persontemp.id)] = score - stealamount
                     embed = discord.Embed(
                         title="Steal",
@@ -699,13 +698,13 @@ async def steal(interaction: discord.Interaction, user: discord.Member):
                     await interaction.followup.send(embed=embed)
                     if stats['usersettings'][str(persontemp.id)]['notifications'] == 2:
                         try:
-                            await persontemp.send(f"{client.user.mention} has stolen {stealamount} points from you in {interaction.guild.name} at {interaction.channel.mention}")
+                            await persontemp.send(f"{interaction.user.mention} ({interaction.user.name}) has stolen {stealamount} points from you in {interaction.guild.name} at {interaction.channel.mention}")
                         except discord.errors.Forbidden:
                             pass
                     elif stats['usersettings'][str(persontemp.id)]['notifications'] == 1:
                         if persontemp.status == discord.Status.offline:
                             try:
-                                await persontemp.send(f"{client.user.mention} has stolen {stealamount} points from you in {interaction.guild.name} at {interaction.channel.mention} (you were offline)")
+                                await persontemp.send(f"{interaction.user.mention} ({interaction.user.name}) has stolen {stealamount} points from you in {interaction.guild.name} at {interaction.channel.mention} (you were offline)")
                             except discord.errors.Forbidden:
                                 pass
                 else:
@@ -720,6 +719,8 @@ async def steal(interaction: discord.Interaction, user: discord.Member):
 async def on_steal_error(interaction: Interaction, error: AppCommandError): # https://discord.com/channels/336642139381301249/1166170085795319868
     if isinstance(error, discord.app_commands.errors.TransformerError):
         await interaction.response.send_message('This person is not in your server, please try someone else', ephemeral=True)
+    else:
+        print(f'Error with {interaction.user.name}: {error}')
 
 @tree.command(name='give', description='Give someone points')
 @app_commands.describe(user= "Who to give to")
