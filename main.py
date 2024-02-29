@@ -1,6 +1,6 @@
 import os
 try:
-    import discord, sys, asyncio, shelve, oyaml, json, pprint, glob, requests, atexit, filecmp, os.path, shutil, datetime, platform
+    import discord, sys, asyncio, shelve, oyaml, json, pprint, glob, requests, atexit, filecmp, os.path, shutil, datetime, platform, logging, time
     from discord.utils import get
     from discord import app_commands, Interaction
     from pyprobs import Probability as pr
@@ -8,9 +8,13 @@ try:
     from typing import Literal
     from discord.app_commands import AppCommandError
     from googletrans import Translator
+    from flask import Flask, g, session, redirect, request, url_for, jsonify, send_from_directory, Response, render_template, abort
+    from werkzeug.middleware.proxy_fix import ProxyFix
+    # from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
     translator = Translator()
-except ModuleNotFoundError:
-    print('not all packages have been installed')
+except ModuleNotFoundError as e:
+    print('not all packages have been installed: ' + str(e))
+    exit(1)
 print('Loading intents and discord client')
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
@@ -65,6 +69,15 @@ global langmsg
 langmsg = {}
 sys.path.insert(1, '/')
 from base import uwu, num
+app = Flask(__name__, template_folder='/html' if platform.node() == 'agbdocker' else 'html', static_folder='/html' if platform.node() == 'agbdocker' else 'html')
+if platform.node() != 'agbdocker':
+    app.debug = True
+app.config["DISCORD_CLIENT_ID"] = private['API']['client-id']  # Discord client ID.
+app.config["DISCORD_CLIENT_SECRET"] = private['API']['client-secret']                # Discord client secret.
+app.config["DISCORD_REDIRECT_URI"] = f"{private['API']['domain']}/callback"                 # URL to your callback endpoint.
+app.config["DISCORD_BOT_TOKEN"] = private['tokens']['agb']   
+app.secret_key = private['API']['secret-key']
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 # generic commands
 
 async def getowner():
@@ -81,14 +94,19 @@ async def getownerid():
 async def on_ready():
     print(f'Logged on as {client.user.name}, attempting to sync commands')
     await client.change_presence(activity=discord.Game('Loading'))
+    global servercount  
+    servercount = len(client.guilds)
     await tree.sync()
     print("Commands synced, you may need to wait up to an hour for commands to appear in your server.")
     loaded = True
     if platform.node() == 'agbdocker':
-        await client.change_presence(activity=discord.Game(f'in {len(client.guilds)} servers'))
+        await client.change_presence(activity=discord.Game(f'in {servercount} servers'))
     else:
         await client.change_presence(activity=discord.Game('in test mode'))
     while True:
+        servercount = len(client.guilds)
+        if platform.node() == 'agbdocker':
+            await client.change_presence(activity=discord.Game(f'in {servercount} servers'))
         backupres = await backupstats()
         if not backupres == False:
             print('Backup created')
@@ -991,4 +1009,29 @@ print('starting scripts')
 
 atexit.register(save_stats)
 
-client.run(private['tokens']['agb'])
+# Web
+@app.route('/main.css')
+def maincss():
+    return send_from_directory('html', 'main.css')
+
+@app.route("/")
+def me():
+    return render_template('index.html', users=str(len(stats['scores'])), servers=str(servercount), botid=client.user.id)
+
+# Start bot
+import threading
+
+def bot():
+    client.run(private['tokens']['agb'])
+def web():
+    # if platform.node() == 'agbdocker':
+        from waitress import serve
+        logger = logging.getLogger('waitress')
+        logger.setLevel(logging.DEBUG)
+        serve(app, host='0.0.0.0', port=4000)
+    # else:
+    #     app.run(host='0.0.0.0', port=4000)
+threading.Thread(target = bot).start()
+if private['API']:
+    time.sleep(1)
+    threading.Thread(target = web).start()

@@ -11,6 +11,7 @@ WORKDIR /data
 COPY main.py /
 COPY tool.py /
 COPY private.yml /
+COPY html /html
 COPY base.py /
 COPY requirements.txt /
 RUN chmod a+x /main.py

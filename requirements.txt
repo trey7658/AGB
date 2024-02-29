@@ -7,3 +7,6 @@ requests
 googletrans
 babel
 oyaml
+Flask
+waitress
+# Flask-Discord

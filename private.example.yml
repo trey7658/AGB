@@ -23,3 +23,14 @@ guild: your-guild-id
 
 # Put your sudo pin here, this is used for destructive actions such as restoring the database
 sudo-pin: your-restore-pin
+# uncomment to use the AGB management site 
+# api:
+#   # Put your AGB domain here, should be kept as localhost, except in specific cases
+#   # Your redirect uri should be http://domain/callback
+#   domain: localhost
+#   # Client secret (not bot token) found in OAuth2
+#   client-secret: "your-client-secret"
+#   # Client ID
+#   client-id: your-client-id
+#   # Secret key. CHANGE THIS TO A RANDOM STRING, DONT LEAVE THIS AS DEFAULT
+#   secret-key: "your-secret-key"
