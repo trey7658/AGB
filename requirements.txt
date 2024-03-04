@@ -4,6 +4,6 @@ pyprobs
 typing
 enum34
 requests
-googletrans
+googletrans==3.1.0a0
 babel
 oyaml
