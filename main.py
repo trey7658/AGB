@@ -189,12 +189,12 @@ async def cmderror(interaction: Interaction, error: AppCommandError): # https://
     elif isinstance(error, KeyError):
         await interaction.response.send_message('This person has not used the bot yet, please try someone else', ephemeral=True)
         owner = await getowner()
-        await owner.send(f'Uncaught keyerror {interaction.user.name} using {interaction.command.name}: {error}')
+        await owner.send(f'Uncaught keyerror {interaction.user.name} using {interaction.command.name}: {error} \nPlease check the logs or create an error on github.')
     else:
         print(f'Error with {interaction.user.name}: {error}')
-        await interaction.response.send_message('There was an error, try again later', ephemeral=True)
+        await interaction.response.send_message('There was an error, try again later. This error has been reported and we will be on it shortly.', ephemeral=True)
         owner = await getowner()
-        await owner.send(f'Uncaught error {interaction.user.name} using {interaction.command.name}: {error}')
+        await owner.send(f'Uncaught error {interaction.user.name} using {interaction.command.name}: {error} \nPlease check the logs or create an error on github.')
 
 @tree.command(name = "about", description = f"About the bot")
 async def aboutbot(interaction: discord.Interaction):
@@ -699,12 +699,12 @@ async def on_steal_error(interaction: Interaction, error: AppCommandError): # ht
     elif isinstance(error, KeyError):
         await interaction.response.send_message('This person has not used the bot yet, please try someone else', ephemeral=True)
         owner = await getowner()
-        await owner.send(f'Uncaught keyerror {interaction.user.name} using {interaction.command.name}: {error}')
+        await owner.send(f'Uncaught keyerror {interaction.user.name} using {interaction.command.name}: {error} \nPlease check the logs or create an error on github.')
     else:
         print(f'Error with {interaction.user.name}: {error}')
-        await interaction.response.send_message('There was an error, try again later', ephemeral=True)
+        await interaction.response.send_message('There was an error, try again later. This error has been reported and we will be on it shortly.', ephemeral=True)
         owner = await getowner()
-        await owner.send(f'Uncaught error {interaction.user.name} using {interaction.command.name}: {error}')
+        await owner.send(f'Uncaught error {interaction.user.name} using {interaction.command.name}: {error} \nPlease check the logs or create an error on github.')
 
 @tree.command(name='give', description='Give someone points')
 @app_commands.describe(user= "Who to give to")
