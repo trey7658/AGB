@@ -620,7 +620,7 @@ async def steal(interaction: discord.Interaction, user: discord.Member):
     if not isinstance(interaction.channel, discord.DMChannel):
             persontemp = user
             if not persontemp.bot:
-                if not persontemp.id in stats['scores']:
+                if not str(persontemp.id) in stats['scores']:
                     await interaction.response.send_message(f'Something went wrong, this person has not used {client.user.name} yet (Try another person).', ephemeral=True)
                     return
                 if not persontemp == interaction.user:
@@ -628,6 +628,7 @@ async def steal(interaction: discord.Interaction, user: discord.Member):
                     if pr.prob(2/5) and (stats['scores'][str(persontemp.id)] > 0):
                         # https://stackoverflow.com/a/72904834
                         # Will create a random number based on a probability
+
                         stealamount = rand.choices(
                             [
                                 rand.randrange(int(stats['scores'][str(persontemp.id)] // 12), int(stats['scores'][str(persontemp.id)] // 11)),
