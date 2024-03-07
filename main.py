@@ -95,6 +95,7 @@ async def on_ready():
             await asyncio.sleep(600)
         else:
             await asyncio.sleep(300)
+        await client.change_presence(activity=discord.Game(f'in {len(client.guilds)} servers'))
 
 async def backupstats():
     with open("stats.json", "w") as f:
@@ -175,14 +176,14 @@ async def on_message(message):
                 await message.channel.send('Please use slash commands', reference=message)
 
 @tree.error
-async def cooldown(interaction: discord.Interaction, error: app_commands.AppCommandError):
-    if isinstance(error, app_commands.CommandOnCooldown):
-        embed = discord.Embed(
-            title="Slow down!",
-            description=f"Please wait {str(round(error.retry_after))} seconds to use {interaction.command.name} again",
-            color=discord.Color.red()
-        )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+# async def cooldown(interaction: discord.Interaction, error: app_commands.AppCommandError):
+async def cooldown(interaction: discord.Interaction, error: app_commands.app_commands.CommandOnCooldown):
+    embed = discord.Embed(
+        title="Slow down!",
+        description=f"Please wait {str(round(error.retry_after))} seconds to use {interaction.command.name} again",
+        color=discord.Color.red()
+    )
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @tree.command(name = "about", description = f"About the bot")
 async def aboutbot(interaction: discord.Interaction):
@@ -613,15 +614,13 @@ async def dig(interaction: discord.Interaction):
 
 @tree.command(name='steal', description='Steal from someone')
 @app_commands.guild_only()
-@app_commands.describe(user= "Who to rob")
+@app_commands.describe(user= "Who to steal from")
 @app_commands.checks.cooldown(1, 50, key=lambda i: (i.user.id))
 async def steal(interaction: discord.Interaction, user: discord.Member):
     if not isinstance(interaction.channel, discord.DMChannel):
             persontemp = user
             if not persontemp.bot:
-                try:
-                    stats['scores'][str(persontemp.id)]
-                except KeyError:
+                if not persontemp.id in stats['scores']:
                     await interaction.response.send_message(f'Something went wrong, this person has not used {client.user.name} yet (Try another person).', ephemeral=True)
                     return
                 if not persontemp == interaction.user:
@@ -645,12 +644,10 @@ async def steal(interaction: discord.Interaction, user: discord.Member):
                             stealamount = round(stealamount[0])
                         print('steal (' + str(stealamount) + '): ' + interaction.user.name + ' - from - ' + persontemp.name)
                     else:
-                        print('steal fail')
                         if stats['scores'][str(persontemp.id)] > 0:
                             stealamount = round(rand.randrange(stats['scores'][str(persontemp.id)]//10, stats['scores'][str(persontemp.id)] //5)) * -1
                         else:
                             stealamount = round(rand.randrange(stats['scores'][str(persontemp.id)]//5, stats['scores'][str(persontemp.id)]//10))
-                        print('steal fail finished')
                     score = stats['scores'][str(interaction.user.id)]            
                     stats['scores'][str(interaction.user.id)] = score + stealamount
                     score = stats['scores'][str(persontemp.id)]
