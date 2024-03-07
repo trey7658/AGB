@@ -176,14 +176,25 @@ async def on_message(message):
                 await message.channel.send('Please use slash commands', reference=message)
 
 @tree.error
-# async def cooldown(interaction: discord.Interaction, error: app_commands.AppCommandError):
-async def cooldown(interaction: discord.Interaction, error: app_commands.app_commands.CommandOnCooldown):
-    embed = discord.Embed(
-        title="Slow down!",
-        description=f"Please wait {str(round(error.retry_after))} seconds to use {interaction.command.name} again",
-        color=discord.Color.red()
-    )
-    await interaction.response.send_message(embed=embed, ephemeral=True)
+async def cmderror(interaction: Interaction, error: AppCommandError): # https://discord.com/channels/336642139381301249/1166170085795319868
+    if isinstance(error, app_commands.errors.TransformerError):
+        await interaction.response.send_message('This command requires the person to be in your server.', ephemeral=True)
+    elif isinstance(error, app_commands.errors.CommandOnCooldown):
+        embed = discord.Embed(
+                title="Slow down!",
+                description=f"Please wait {str(round(error.retry_after))} seconds to use {interaction.command.name} again",
+                color=discord.Color.red()
+            )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+    elif isinstance(error, KeyError):
+        await interaction.response.send_message('This person has not used the bot yet, please try someone else', ephemeral=True)
+        owner = await getowner()
+        await owner.send(f'Uncaught keyerror {interaction.user.name} using {interaction.command.name}: {error}')
+    else:
+        print(f'Error with {interaction.user.name}: {error}')
+        await interaction.response.send_message('There was an error, try again later', ephemeral=True)
+        owner = await getowner()
+        await owner.send(f'Uncaught error {interaction.user.name} using {interaction.command.name}: {error}')
 
 @tree.command(name = "about", description = f"About the bot")
 async def aboutbot(interaction: discord.Interaction):
@@ -676,10 +687,24 @@ async def steal(interaction: discord.Interaction, user: discord.Member):
 
 @steal.error
 async def on_steal_error(interaction: Interaction, error: AppCommandError): # https://discord.com/channels/336642139381301249/1166170085795319868
-    if isinstance(error, discord.app_commands.errors.TransformerError):
+    if isinstance(error, app_commands.errors.TransformerError):
         await interaction.response.send_message('This person is not in your server, please try someone else', ephemeral=True)
+    elif isinstance(error, app_commands.errors.CommandOnCooldown):
+        embed = discord.Embed(
+                title="Slow down!",
+                description=f"Please wait {str(round(error.retry_after))} seconds to use {interaction.command.name} again",
+                color=discord.Color.red()
+            )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+    elif isinstance(error, KeyError):
+        await interaction.response.send_message('This person has not used the bot yet, please try someone else', ephemeral=True)
+        owner = await getowner()
+        await owner.send(f'Uncaught keyerror {interaction.user.name} using {interaction.command.name}: {error}')
     else:
         print(f'Error with {interaction.user.name}: {error}')
+        await interaction.response.send_message('There was an error, try again later', ephemeral=True)
+        owner = await getowner()
+        await owner.send(f'Uncaught error {interaction.user.name} using {interaction.command.name}: {error}')
 
 @tree.command(name='give', description='Give someone points')
 @app_commands.describe(user= "Who to give to")
